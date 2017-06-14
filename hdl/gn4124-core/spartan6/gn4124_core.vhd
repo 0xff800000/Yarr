@@ -368,8 +368,10 @@ begin
   status_o(24) <= ldm_arb_req;
   status_o(25) <= pdm_arb_req;
   status_o(26) <= wbm_arb_req;
-  status_o(27 downto 28) <= p_rd_d_rdy;
-  status_o(29 downto 30) <= l_wr_rdy;
+  --status_o(27 downto 28) <= p_rd_d_rdy; --DEBUG--
+  status_o(28 downto 27) <= p_rd_d_rdy; --DEBUG--
+  --status_o(29 downto 30) <= l_wr_rdy; --DEBUG--
+  status_o(30 downto 29) <= l_wr_rdy; --DEBUG--
   status_o(31) <= l2p_rdy;
 --  status_o(31 downto 1) <= (others => '0');
   

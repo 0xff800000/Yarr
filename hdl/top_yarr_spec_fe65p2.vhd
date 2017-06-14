@@ -719,7 +719,9 @@ architecture rtl of yarr is
     signal sys_clk_200        : std_logic;
     signal sys_clk_fb         : std_logic;
     signal sys_clk_pll_locked : std_logic;
-
+	 signal sys_clk_40_buf_90_deg    : std_logic;
+	 
+	 
   -- DDR3 clock
     signal ddr_clk     : std_logic;
     signal ddr_clk_buf : std_logic;  
@@ -1421,6 +1423,9 @@ begin
                     CLKOUT2_DIVIDE     => 3,
                     CLKOUT2_PHASE      => 0.000,
                     CLKOUT2_DUTY_CYCLE => 0.500,
+						  CLKOUT3_DIVIDE     => 25,
+						  CLKOUT3_PHASE      => 90.000,
+						  CLKOUT3_DUTY_CYCLE => 0.500,
                     CLKIN_PERIOD       => 50.0,
                     REF_JITTER         => 0.016)
     port map (
@@ -1428,7 +1433,7 @@ begin
                  CLKOUT0  => sys_clk_40_buf,
                  CLKOUT1  => sys_clk_200_buf,
                  CLKOUT2  => ddr_clk_buf,
-                 CLKOUT3  => open,
+                 CLKOUT3  => sys_clk_40_buf_90_deg,
                  CLKOUT4  => open,
                  CLKOUT5  => open,
                  LOCKED   => sys_clk_pll_locked,
