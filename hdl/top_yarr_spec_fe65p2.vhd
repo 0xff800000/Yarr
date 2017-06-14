@@ -145,7 +145,23 @@ entity yarr is
           EXT_1_P : in std_logic;
           EXT_1_N : in std_logic;
           IO_0 : out std_logic;
-          IO_1 : in std_logic
+          IO_1 : in std_logic;
+
+
+        ---------------------------------------------------------
+        -- FMC to ABC driver
+        ---------------------------------------------------------
+		  BC_N : out std_logic;
+		  BC_P : out std_logic;
+		  L0_CMD_N : out std_logic;
+		  L0_CMD_P : out std_logic;
+		  R3_N : out std_logic;
+		  R3_P : out std_logic;
+		  DATA_L_N : in std_logic;
+		  DATA_L_P : in std_logic;
+		  DATA_R_N : in std_logic;
+		  DATA_R_P : in std_logic
+			 
     );
 end yarr;
 
