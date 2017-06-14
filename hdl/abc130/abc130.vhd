@@ -70,6 +70,8 @@ entity abc is
            -- Static signals
 			  TERM_O : out  STD_LOGIC;
            ADDR_O : out  STD_LOGIC_VECTOR(4 DOWNTO 0);
+			  REG_EN_D_O : out  STD_LOGIC;
+			  REG_EN_A_O : out  STD_LOGIC;
            SHUNT_CTL_O : out  STD_LOGIC);
 end abc;
 
@@ -89,7 +91,11 @@ begin
 	term_o <= '0';
 	
 	-- No shunt control
-	--SHUNT_CTL_O <= '0';
+	SHUNT_CTL_O <= '0';
+
+	-- Enable voltage regulators
+	REG_EN_D_O <= '0';
+	REG_EN_A_O <= '0';
 
 	-- Connection from YARR to ABC
 	DRC_P <= Y_DRC_P;
@@ -101,6 +107,7 @@ begin
 	R3_P <= Y_R3_P;
 	R3_N <= Y_R3_N;
 	RSTB_O <= Y_RSTB_O;
+	
 	-- Connection from ABC to YARR
 	Y_DATA_L_P <= DATA_L_P ;
 	Y_DATA_L_N <= DATA_L_N;
