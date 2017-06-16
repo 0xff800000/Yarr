@@ -43,9 +43,6 @@ architecture Behavioral of ddr_buffer is
 	signal sys_clk_i : std_logic;
 	signal rst_i : std_logic;
 	
-	signal L0_s : std_logic;
-	signal CMD_s : std_logic;
-	
 	signal sys_clk_fb : std_logic;
 	signal sys_clk_pll_locked : std_logic;
 	signal sys_clk_40_buf_90_deg : std_logic;
@@ -56,8 +53,6 @@ architecture Behavioral of ddr_buffer is
 	
 	signal received_l0 : std_logic_vector(31 downto 0);
 	signal received_cmd : std_logic_vector(31 downto 0);
-	signal ptr1 : natural := 0;
-	signal ptr2 : natural := 0;
 	
 	-- Wishbone slave interface
 	signal wb_adr : std_logic_vector(31 downto 0);
@@ -130,6 +125,15 @@ begin
 		wb_dat_i <= (others => '0');
 		wait until rst_i = '0';
 		
+		-- Set enable mask
+		wb_cyc <= '1';
+		wb_stb <= '1';
+		wb_we <= '1';
+		wb_adr <= x"00000001";
+		wb_dat_i <= x"00000008";
+		wait until sys_clk_40_buf = '0';
+		wait until sys_clk_40_buf = '1';
+		
 		-- Put data in the FIFO
 		wb_cyc <= '1';
 		wb_stb <= '1';
@@ -139,21 +143,21 @@ begin
 		wait until sys_clk_40_buf = '0';
 		wait until sys_clk_40_buf = '1';
 		
-		-- Set trigger every clock cycle
-		wb_cyc <= '1';
-		wb_stb <= '1';
-		wb_we <= '1';
-		wb_adr <= x"00000006";
-		wb_dat_i <= x"00000001";
-		wait until sys_clk_40_buf = '0';
-		wait until sys_clk_40_buf = '1';
-		
 		-- Set enable mask
 		wb_cyc <= '1';
 		wb_stb <= '1';
 		wb_we <= '1';
 		wb_adr <= x"00000001";
-		wb_dat_i <= (others => '1');
+		wb_dat_i <= x"00000004";
+		wait until sys_clk_40_buf = '0';
+		wait until sys_clk_40_buf = '1';
+		
+		-- Put data in the FIFO
+		wb_cyc <= '1';
+		wb_stb <= '1';
+		wb_we <= '1';
+		wb_adr <= (others => '0');
+		wb_dat_i <= x"c0decafe";
 		wait until sys_clk_40_buf = '0';
 		wait until sys_clk_40_buf = '1';
 		
@@ -165,18 +169,6 @@ begin
 		wb_dat_i <= x"00000000";
 		wait until sys_clk_40_buf = '0';
 		wait until sys_clk_40_buf = '1';
-		
-		
-		-- Put data in the FIFO
-		for i in 0 to 64 loop
-			wb_cyc <= '1';
-			wb_stb <= '1';
-			wb_we <= '1';
-			wb_adr <= (others => '0');
-			wb_dat_i <= x"00000000";
-			wait until sys_clk_40_buf = '0';
-			wait until sys_clk_40_buf = '1';
-		end loop;
 
 		-- End wisbone transaction
 		wb_cyc <= '0';
@@ -191,28 +183,16 @@ begin
 	-- Reading the signals from DDR buffer output
 	process(sys_clk_40_buf,rst_i) is
 	begin
-		if (rst_i = '1') then
-			ptr1 <= 0;
-		elsif rising_edge(sys_clk_40_buf) then
-			received_l0(ptr2) <= data_s;
-			if(ptr1 < 31) then
-				ptr1 <= ptr1 + 1;
-			else
-				ptr1 <= 0;
-			end if;
+		if rising_edge(sys_clk_40_buf) then
+			received_l0 <= std_logic_vector(unsigned(received_l0) sll 1);
+			received_l0(0) <= data_s;
 		end if;
 	end process;
 	process(sys_clk_40_buf,rst_i) is
 	begin
-		if (rst_i = '1') then
-			ptr2 <= 0;
-		elsif falling_edge(sys_clk_40_buf) then
-			received_cmd(ptr2) <= data_s;
-			if(ptr2 < 31) then
-				ptr2 <= ptr2 + 1;
-			else
-				ptr2 <= 0;
-			end if;
+		if falling_edge(sys_clk_40_buf) then
+			received_cmd <= std_logic_vector(unsigned(received_cmd) sll 1);
+			received_cmd(0) <= data_s;
 		end if;
 	end process;
 	
@@ -239,15 +219,27 @@ begin
 		CLKOUT3_DUTY_CYCLE => 0.500,
 		CLKIN_PERIOD       => 50.0,
 		REF_JITTER         => 0.016)
+--	port map (
+--		CLKFBOUT => sys_clk_fb,
+--		CLKOUT0  => sys_clk_40_buf,
+--		CLKOUT1  => sys_clk_200_buf,
+--		CLKOUT2  => ddr_clk_buf,
+--		CLKOUT3  => sys_clk_40_buf_90_deg,
+--		CLKOUT4  => open,
+--		CLKOUT5  => open,
+--		LOCKED   => sys_clk_pll_locked,
+--		RST      => '0',
+--		CLKFBIN  => sys_clk_fb,
+--		CLKIN    => sys_clk_i);
 	port map (
-		CLKFBOUT => sys_clk_fb,
+		CLKFBOUT => open,
 		CLKOUT0  => sys_clk_40_buf,
-		CLKOUT1  => sys_clk_200_buf,
-		CLKOUT2  => ddr_clk_buf,
+		CLKOUT1  => open,
+		CLKOUT2  => open,
 		CLKOUT3  => sys_clk_40_buf_90_deg,
 		CLKOUT4  => open,
 		CLKOUT5  => open,
-		LOCKED   => sys_clk_pll_locked,
+		LOCKED   => open,
 		RST      => '0',
 		CLKFBIN  => sys_clk_fb,
 		CLKIN    => sys_clk_i);
