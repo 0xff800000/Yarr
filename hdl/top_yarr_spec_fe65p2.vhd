@@ -16,7 +16,7 @@ use UNISIM.vcomponents.all;
 
 entity yarr is
     generic (
-                g_TX_CHANNELS : integer := 1;
+                g_TX_CHANNELS : integer := 4;
                 g_RX_CHANNELS : integer := 1
             );
     port
@@ -726,6 +726,9 @@ architecture rtl of yarr is
     signal CLK_160_buf : std_logic;
     signal CLK_640_buf : std_logic;
     signal ioclk_fb : std_logic;
+	 
+	 signal not_sys_clk_40_90_deg : std_logic;
+	 signal sys_clk_40_90_deg : std_logic;
 
   -- System clock generation
     signal sys_clk_in         : std_logic;
@@ -736,6 +739,7 @@ architecture rtl of yarr is
     signal sys_clk_fb         : std_logic;
     signal sys_clk_pll_locked : std_logic;
 	 signal sys_clk_40_buf_90_deg    : std_logic;
+	 signal not_sys_clk_40_buf_90_deg : std_logic;
 	 
 	 
   -- DDR3 clock
@@ -881,6 +885,8 @@ architecture rtl of yarr is
 	 signal so_cnfg_t : std_logic;
 	 signal hit_or_t : std_logic;
 	 signal out_data_t : std_logic;
+	 
+	 signal L0_CMD_s : std_logic;
 	 
 begin
     -- Buffers
@@ -1422,45 +1428,79 @@ begin
                  I => clk20_vcxo_i,
                  O => sys_clk_in);
 
-    cmp_sys_clk_pll : PLL_BASE
-    generic map (
-                    BANDWIDTH          => "OPTIMIZED",
-                    CLK_FEEDBACK       => "CLKFBOUT",
-                    COMPENSATION       => "INTERNAL",
-                    DIVCLK_DIVIDE      => 1,
-                    CLKFBOUT_MULT      => 50,
-                    CLKFBOUT_PHASE     => 0.000,
-                    CLKOUT0_DIVIDE     => 25,
-                    CLKOUT0_PHASE      => 0.000,
-                    CLKOUT0_DUTY_CYCLE => 0.500,
-                    CLKOUT1_DIVIDE     => 5,
-                    CLKOUT1_PHASE      => 0.000,
-                    CLKOUT1_DUTY_CYCLE => 0.500,
-                    CLKOUT2_DIVIDE     => 3,
-                    CLKOUT2_PHASE      => 0.000,
-                    CLKOUT2_DUTY_CYCLE => 0.500,
-						  CLKOUT3_DIVIDE     => 25,
-						  CLKOUT3_PHASE      => 90.000,
-						  CLKOUT3_DUTY_CYCLE => 0.500,
-                    CLKIN_PERIOD       => 50.0,
-                    REF_JITTER         => 0.016)
-    port map (
-                 CLKFBOUT => sys_clk_fb,
-                 CLKOUT0  => sys_clk_40_buf,
-                 CLKOUT1  => sys_clk_200_buf,
-                 CLKOUT2  => ddr_clk_buf,
-                 CLKOUT3  => sys_clk_40_buf_90_deg,
-                 CLKOUT4  => open,
-                 CLKOUT5  => open,
-                 LOCKED   => sys_clk_pll_locked,
-                 RST      => '0',
-                 CLKFBIN  => sys_clk_fb,
-                 CLKIN    => sys_clk_in);
+	-- Config PLL
+	cmp_sys_clk_pll : PLL_BASE
+	generic map (
+		BANDWIDTH          => "OPTIMIZED",
+		CLK_FEEDBACK       => "CLKFBOUT",
+		COMPENSATION       => "INTERNAL",
+		DIVCLK_DIVIDE      => 1,
+		CLKFBOUT_MULT      => 50,
+		CLKFBOUT_PHASE     => 0.000,
+		CLKOUT0_DIVIDE     => 25,
+		CLKOUT0_PHASE      => 90.000,
+		CLKOUT0_DUTY_CYCLE => 0.500,
+		CLKOUT1_DIVIDE     => 5,
+		CLKOUT1_PHASE      => 0.000,
+		CLKOUT1_DUTY_CYCLE => 0.500,
+		CLKOUT2_DIVIDE     => 3,
+		CLKOUT2_PHASE      => 0.000,
+		CLKOUT2_DUTY_CYCLE => 0.500,
+		CLKOUT3_DIVIDE     => 25,
+		CLKOUT3_PHASE      => 0.000,
+		CLKOUT3_DUTY_CYCLE => 0.500,
+		CLKIN_PERIOD       => 50.0,
+		REF_JITTER         => 0.016)
+	port map (
+		CLKFBOUT => sys_clk_fb,
+		CLKOUT0  => sys_clk_40_buf,
+		CLKOUT1  => sys_clk_200_buf,
+		CLKOUT2  => ddr_clk_buf,
+		CLKOUT3  => sys_clk_40_buf_90_deg,
+		CLKOUT4  => open,
+		CLKOUT5  => open,
+		LOCKED   => sys_clk_pll_locked,
+		RST      => '0',
+		CLKFBIN  => sys_clk_fb,
+		CLKIN    => sys_clk_in);
+		
+	not_sys_clk_40_buf_90_deg <= not sys_clk_40_buf_90_deg;
+
+	-- Config DDR buffer
+	abc_ddr_buffer : ODDR2
+	port map (
+		--Q  => L0_CMD_s,
+		Q  => L0_CMD_P,
+		C0 => sys_clk_40_90_deg,
+		C1 => not_sys_clk_40_90_deg,
+		CE => '1',
+		D0 => fe_cmd_o(3),
+		D1 => fe_cmd_o(2),
+		R  => '0',
+		S  => '0'
+	);
+	--L0_CMD_P <= L0_CMD_s;
+	L0_CMD_N <= not L0_CMD_s;
+	BC_P <= sys_clk_40;
+	--BC_N <= not sys_clk_40;
+	BC_N <= '0';
+	R3_N <= '0';
+	R3_P <= '1';
 
     cmp_clk_125_buf : BUFG
     port map (
                  O => sys_clk_40,
                  I => sys_clk_40_buf);
+
+    cmp_clk_125_buf2 : BUFG
+    port map (
+                 O => sys_clk_40_90_deg,
+                 I => sys_clk_40_buf_90_deg);
+					  
+    cmp_clk_125_buf3 : BUFG
+    port map (
+                 O => not_sys_clk_40_90_deg,
+                 I => not_sys_clk_40_buf_90_deg);
 
     cmp_clk_200_buf : BUFG
     port map (

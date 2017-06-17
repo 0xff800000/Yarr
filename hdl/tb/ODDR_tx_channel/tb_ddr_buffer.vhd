@@ -219,27 +219,15 @@ begin
 		CLKOUT3_DUTY_CYCLE => 0.500,
 		CLKIN_PERIOD       => 50.0,
 		REF_JITTER         => 0.016)
---	port map (
---		CLKFBOUT => sys_clk_fb,
---		CLKOUT0  => sys_clk_40_buf,
---		CLKOUT1  => sys_clk_200_buf,
---		CLKOUT2  => ddr_clk_buf,
---		CLKOUT3  => sys_clk_40_buf_90_deg,
---		CLKOUT4  => open,
---		CLKOUT5  => open,
---		LOCKED   => sys_clk_pll_locked,
---		RST      => '0',
---		CLKFBIN  => sys_clk_fb,
---		CLKIN    => sys_clk_i);
 	port map (
-		CLKFBOUT => open,
+		CLKFBOUT => sys_clk_fb,
 		CLKOUT0  => sys_clk_40_buf,
-		CLKOUT1  => open,
-		CLKOUT2  => open,
+		CLKOUT1  => sys_clk_200_buf,
+		CLKOUT2  => ddr_clk_buf,
 		CLKOUT3  => sys_clk_40_buf_90_deg,
 		CLKOUT4  => open,
 		CLKOUT5  => open,
-		LOCKED   => open,
+		LOCKED   => sys_clk_pll_locked,
 		RST      => '0',
 		CLKFBIN  => sys_clk_fb,
 		CLKIN    => sys_clk_i);
