@@ -13,12 +13,16 @@ int main(int argc, char **argv) {
 	TxCore myTx(&mySpec);
 	
 	// Enable all channels
-	myTx.setCmdEnable(0xffffffff);
+
 
 	// Send data to the fifo
 	std::cout << "Sending numbers..." << std::endl;
-	for(uint32_t i=0; i<0xffffffff;i++)
+	for(uint32_t i=0; i<0xffffffff;i++){
+		myTx.setCmdEnable(1<<2);
 		myTx.writeFifo(i);
+		myTx.setCmdEnable(1<<3);
+		myTx.writeFifo(~i);
+	}
 	std::cout << "Done." << std::endl;
 
 	return 0;
