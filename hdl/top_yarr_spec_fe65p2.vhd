@@ -1469,8 +1469,7 @@ begin
 	-- Config DDR buffer
 	abc_ddr_buffer : ODDR2
 	port map (
-		--Q  => L0_CMD_s,
-		Q  => L0_CMD_P,
+		Q  => L0_CMD_s,
 		C0 => sys_clk_40_90_deg,
 		C1 => not_sys_clk_40_90_deg,
 		CE => '1',
@@ -1479,11 +1478,11 @@ begin
 		R  => '0',
 		S  => '0'
 	);
-	--L0_CMD_P <= L0_CMD_s;
-	L0_CMD_N <= not L0_CMD_s;
-	BC_P <= sys_clk_40;
+	l0_buf : OBUFDS port map (O => L0_CMD_P, OB => L0_CMD_N, I => L0_CMD_s);
+	bc_buf : OBUFDS port map (O => BC_P, OB => BC_N, I => sys_clk_40);
+	--BC_P <= sys_clk_40;
 	--BC_N <= not sys_clk_40;
-	BC_N <= '0';
+	--BC_N <= '0';
 	R3_N <= '0';
 	R3_P <= '1';
 
