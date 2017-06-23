@@ -17,7 +17,7 @@ use UNISIM.vcomponents.all;
 entity yarr is
     generic (
                 g_TX_CHANNELS : integer := 4;
-                g_RX_CHANNELS : integer := 1
+                g_RX_CHANNELS : integer := 3
             );
     port
     (
@@ -1166,6 +1166,10 @@ begin
                                            busy_o => open,
                                            debug_o => debug
                                        );
+
+	-- Map the data input
+	data_l_buf : IBUFDS generic map(DIFF_TERM => TRUE, IBUF_LOW_PWR => FALSE) port map (O => fe_data_i(1), I => DATA_L_P, IB => DATA_L_N);
+	data_r_buf : IBUFDS generic map(DIFF_TERM => TRUE, IBUF_LOW_PWR => FALSE) port map (O => fe_data_i(2), I => DATA_R_P, IB => DATA_R_N);
 
     cmp_wb_rx_bridge : wb_rx_bridge port map (
         -- Sys Connect

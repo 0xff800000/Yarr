@@ -106,7 +106,8 @@ begin
 	L0_CMD_N <= Y_L0_CMD_N;
 	R3_P <= Y_R3_P;
 	R3_N <= Y_R3_N;
-	RSTB_O <= Y_RSTB_O;
+	--RSTB_O <= Y_RSTB_O;
+	RSTB_O <= '1';
 	
 	-- Connection from ABC to YARR
 	Y_DATA_L_P <= DATA_L_P ;
