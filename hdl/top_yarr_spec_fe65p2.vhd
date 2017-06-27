@@ -153,6 +153,8 @@ entity yarr is
         ---------------------------------------------------------
 		  BC_N : out std_logic;
 		  BC_P : out std_logic;
+		  DRC_N : out std_logic;
+		  DRC_P : out std_logic;
 		  L0_CMD_N : out std_logic;
 		  L0_CMD_P : out std_logic;
 		  R3_N : out std_logic;
@@ -733,6 +735,7 @@ architecture rtl of yarr is
   -- System clock generation
     signal sys_clk_in         : std_logic;
     signal sys_clk_40_buf    : std_logic;
+	 signal sys_clk_80_buf    : std_logic;
     signal sys_clk_200_buf    : std_logic;
     signal sys_clk_40        : std_logic;
     signal sys_clk_200        : std_logic;
@@ -740,6 +743,7 @@ architecture rtl of yarr is
     signal sys_clk_pll_locked : std_logic;
 	 signal sys_clk_40_buf_90_deg    : std_logic;
 	 signal not_sys_clk_40_buf_90_deg : std_logic;
+	 signal sys_clk_80 : std_logic;
 	 
 	 
   -- DDR3 clock
@@ -1453,6 +1457,9 @@ begin
 		CLKOUT3_DIVIDE     => 25,
 		CLKOUT3_PHASE      => 0.000,
 		CLKOUT3_DUTY_CYCLE => 0.500,
+		CLKOUT4_DIVIDE     => 13,
+		CLKOUT4_PHASE      => 90.000,
+		CLKOUT4_DUTY_CYCLE => 0.500,
 		CLKIN_PERIOD       => 50.0,
 		REF_JITTER         => 0.016)
 	port map (
@@ -1461,7 +1468,7 @@ begin
 		CLKOUT1  => sys_clk_200_buf,
 		CLKOUT2  => ddr_clk_buf,
 		CLKOUT3  => sys_clk_40_buf_90_deg,
-		CLKOUT4  => open,
+		CLKOUT4  => sys_clk_80_buf,
 		CLKOUT5  => open,
 		LOCKED   => sys_clk_pll_locked,
 		RST      => '0',
@@ -1484,26 +1491,32 @@ begin
 	);
 	l0_buf : OBUFDS port map (O => L0_CMD_P, OB => L0_CMD_N, I => L0_CMD_s);
 	bc_buf : OBUFDS port map (O => BC_P, OB => BC_N, I => sys_clk_40);
+	drc_buf : OBUFDS port map (O => DRC_P, OB => DRC_N, I => sys_clk_80);
 	--BC_P <= sys_clk_40;
 	--BC_N <= not sys_clk_40;
 	--BC_N <= '0';
 	R3_N <= '0';
 	R3_P <= '1';
 
-    cmp_clk_125_buf : BUFG
+    cmp_clk_40_buf : BUFG
     port map (
                  O => sys_clk_40,
                  I => sys_clk_40_buf);
 
-    cmp_clk_125_buf2 : BUFG
+    cmp_clk_4090_buf2 : BUFG
     port map (
                  O => sys_clk_40_90_deg,
                  I => sys_clk_40_buf_90_deg);
 					  
-    cmp_clk_125_buf3 : BUFG
+    cmp_clk_40n90_buf3 : BUFG
     port map (
                  O => not_sys_clk_40_90_deg,
                  I => not_sys_clk_40_buf_90_deg);
+
+    cmp_clk_80_buf : BUFG
+    port map (
+                 O => sys_clk_80,
+                 I => sys_clk_80_buf);
 
     cmp_clk_200_buf : BUFG
     port map (
