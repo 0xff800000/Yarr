@@ -26,8 +26,8 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
+library UNISIM;
+use UNISIM.VComponents.all;
 
 entity abc is
 
@@ -76,13 +76,22 @@ entity abc is
 end abc;
 
 architecture Behavioral of abc is
+	signal drc_s : std_logic;
+	signal bco_s : std_logic;
+	signal l0_cmd_s : std_logic;
+	signal r3_s : std_logic;
+	signal data_l_s : std_logic;
+	signal data_r_s : std_logic;
 	
 begin
 	-- No flow control
-	XOFFF_L_P <= '0';
-	XOFFF_L_n <= '1';
-	XOFFF_R_P <= '0';
-	XOFFF_R_n <= '1';
+	xoff_L_obuf : OBUFDS port map (O => XOFFF_L_P, OB => XOFFF_L_n, I => '0');
+--	XOFFF_L_P <= '0';
+--	XOFFF_L_n <= '1';
+
+	xoff_R_obuf : OBUFDS port map (O => XOFFF_R_P, OB => XOFFF_R_n, I => '0');
+--	XOFFF_R_P <= '0';
+--	XOFFF_R_n <= '1';
 	
 	-- Set abc address to 0x00
 	addr_o <= (others => '0');
@@ -98,22 +107,42 @@ begin
 	REG_EN_A_O <= '0';
 
 	-- Connection from YARR to ABC
-	DRC_P <= Y_DRC_P;
-	DRC_N <= Y_DRC_N;
-	BCO_P <= Y_BCO_P;
-	BCO_N <= Y_BCO_N;
-	L0_CMD_P <= Y_L0_CMD_P;
-	L0_CMD_N <= Y_L0_CMD_N;
-	R3_P <= Y_R3_P;
-	R3_N <= Y_R3_N;
+	drc_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => drc_s, I => Y_DRC_P, IB => Y_DRC_N);
+	drc_obuf : OBUFDS port map (O => DRC_P, OB => DRC_N, I => drc_s);
+--	DRC_P <= Y_DRC_P;
+--	DRC_N <= Y_DRC_N;
+
+	bco_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => bco_s, I => Y_BCO_P, IB => Y_BCO_N);
+	bco_obuf : OBUFDS port map (O => BCO_P, OB => BCO_N, I => bco_s);
+--	BCO_P <= Y_BCO_P;
+--	BCO_N <= Y_BCO_N;
+
+	l0_cmd_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => l0_cmd_s, I => Y_L0_CMD_P, IB => Y_L0_CMD_N);
+	l0_cmd_obuf : OBUFDS port map (O => L0_CMD_P, OB => L0_CMD_N, I => l0_cmd_s);
+--	L0_CMD_P <= Y_L0_CMD_P;
+--	L0_CMD_N <= Y_L0_CMD_N;
+
+	r3_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => r3_s, I => Y_R3_P, IB => Y_R3_N);
+	r3_obuf : OBUFDS port map (O => R3_P, OB => R3_N, I => r3_s);
+--	R3_P <= Y_R3_P;
+--	R3_N <= Y_R3_N;
+
+
 	--RSTB_O <= Y_RSTB_O;
 	RSTB_O <= '1';
 	
 	-- Connection from ABC to YARR
-	Y_DATA_L_P <= DATA_L_P ;
-	Y_DATA_L_N <= DATA_L_N;
-	Y_DATA_R_P <= DATA_R_P;
-	Y_DATA_R_N <= DATA_R_N;
+--	data_l_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => data_l_s, I => DATA_L_P, IB => DATA_L_N);
+	data_l_s <= data_l_p;
+	data_l_obuf : OBUFDS port map (O => Y_DATA_L_P, OB => Y_DATA_L_N, I => data_l_s);
+--	Y_DATA_L_P <= DATA_L_P;
+--	Y_DATA_L_N <= DATA_L_N;
+
+--	data_r_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => data_r_s, I => DATA_R_P, IB => DATA_R_N);
+	data_r_s <= data_r_p;
+	data_r_obuf : OBUFDS port map (O => Y_DATA_R_P, OB => Y_DATA_R_N, I => data_r_s);
+--	Y_DATA_R_P <= DATA_R_P;
+--	Y_DATA_R_N <= DATA_R_N;
 
 end Behavioral;
 
