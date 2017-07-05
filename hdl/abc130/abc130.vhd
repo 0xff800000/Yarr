@@ -43,8 +43,8 @@ entity abc is
            Y_R3_N : in  STD_LOGIC;
 			  Y_RSTB_O : in  STD_LOGIC;
 			  -- Data to YARR
-           Y_DATA_L_P : out  STD_LOGIC;
-           Y_DATA_L_N : out  STD_LOGIC;
+--           Y_DATA_L_P : out  STD_LOGIC;
+--           Y_DATA_L_N : out  STD_LOGIC;
            Y_DATA_R_P : out  STD_LOGIC;
            Y_DATA_R_N : out  STD_LOGIC;
            -- Commands to ABC
@@ -58,15 +58,21 @@ entity abc is
            R3_N : out  STD_LOGIC;
 			  RSTB_O : out  STD_LOGIC;
 			  -- Data from ABC
-           DATA_L_P : in  STD_LOGIC;
-           DATA_L_N : in  STD_LOGIC;
+--           DATA_L_P : in  STD_LOGIC;
+--           DATA_L_N : in  STD_LOGIC;
+           DATA_L_P : out  STD_LOGIC;
+           DATA_L_N : out  STD_LOGIC;
            DATA_R_P : in  STD_LOGIC;
            DATA_R_N : in  STD_LOGIC;
 			  -- Flow control
-			  XOFFF_L_P : out  STD_LOGIC;
-			  XOFFF_L_N : out  STD_LOGIC;
+			  XOFFF_L_P : in  STD_LOGIC;
+			  XOFFF_L_N : in  STD_LOGIC;
+--			  XOFFF_L_P : out  STD_LOGIC;
+--			  XOFFF_L_N : out  STD_LOGIC;
 			  XOFFF_R_P : out  STD_LOGIC;
 			  XOFFF_R_N : out  STD_LOGIC;
+--			  XOFFF_R_P : in  STD_LOGIC;
+--			  XOFFF_R_N : in  STD_LOGIC;
            -- Static signals
 			  TERM_O : out  STD_LOGIC;
            ADDR_O : out  STD_LOGIC_VECTOR(4 DOWNTO 0);
@@ -85,7 +91,7 @@ architecture Behavioral of abc is
 	
 begin
 	-- No flow control
-	xoff_L_obuf : OBUFDS port map (O => XOFFF_L_P, OB => XOFFF_L_n, I => '0');
+--	xoff_L_obuf : OBUFDS port map (O => XOFFF_L_P, OB => XOFFF_L_n, I => '0');
 --	XOFFF_L_P <= '0';
 --	XOFFF_L_n <= '1';
 
@@ -132,9 +138,13 @@ begin
 	RSTB_O <= '1';
 	
 	-- Connection from ABC to YARR
+	data_l_s <= '0';
+	data_l_n <= '1';
+	data_l_p <= '0';
+	
 --	data_l_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => data_l_s, I => DATA_L_P, IB => DATA_L_N);
-	data_l_s <= data_l_p;
-	data_l_obuf : OBUFDS port map (O => Y_DATA_L_P, OB => Y_DATA_L_N, I => data_l_s);
+--	data_l_s <= data_l_p;
+--	data_l_obuf : OBUFDS port map (O => Y_DATA_L_P, OB => Y_DATA_L_N, I => data_l_s);
 --	Y_DATA_L_P <= DATA_L_P;
 --	Y_DATA_L_N <= DATA_L_N;
 
