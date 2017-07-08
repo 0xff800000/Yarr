@@ -25,17 +25,27 @@ int main(int argc, char **argv) {
 	uint32_t header = 0b1011111000000;
 	uint32_t reg = 0x10;
 	uint32_t abcAddr = 0b11111;
-	uint32_t rwBit = 0;
-	uint32_t data = 0xdeadbeef;
+	uint32_t rwBit = 1;
+	uint32_t data = (1<<8)|(1<<12);
+
+	uint32_t writeCmd = header;
+	writeCmd = (writeCmd << 5) | abcAddr;
+	writeCmd = (writeCmd << 7) | 0x20;
+	writeCmd = (writeCmd << 1) | rwBit;
 	
+	std::cout << "Configuring register." << std::endl;
+	myTx.writeFifo(writeCmd);
+	myTx.writeFifo(data);
+	usleep(100);
+
 	std::cout << "Scanning registers." << std::endl;
 	
 
 	for(int r=0; r<0x7f; r++){
-		uint32_t writeCmd = header;
+		writeCmd = header;
 		writeCmd = (writeCmd << 5) | abcAddr;
 		writeCmd = (writeCmd << 7) | r;
-		writeCmd = (writeCmd << 1) | rwBit;
+		//writeCmd = (writeCmd << 1) | rwBit;
 
 		myTx.writeFifo(writeCmd);
 		myTx.writeFifo(0);

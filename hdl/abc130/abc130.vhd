@@ -85,6 +85,7 @@ architecture Behavioral of abc is
 	signal drc_s : std_logic;
 	signal bco_s : std_logic;
 	signal l0_cmd_s : std_logic;
+	signal l0_cmd_sample : std_logic;
 	signal r3_s : std_logic;
 	signal data_l_s : std_logic;
 	signal data_r_s : std_logic;
@@ -103,7 +104,7 @@ begin
 	addr_o <= (others => '0');
 	
 	-- No LVDS terminaison
-	term_o <= '0';
+	term_o <= '1';
 	
 	-- No shunt control
 	SHUNT_CTL_O <= '0';
@@ -123,13 +124,20 @@ begin
 --	BCO_P <= Y_BCO_P;
 --	BCO_N <= Y_BCO_N;
 
+	--l0_cmd_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => l0_cmd_sample, I => Y_L0_CMD_P, IB => Y_L0_CMD_N);
 	l0_cmd_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => l0_cmd_s, I => Y_L0_CMD_P, IB => Y_L0_CMD_N);
 	l0_cmd_obuf : OBUFDS port map (O => L0_CMD_P, OB => L0_CMD_N, I => l0_cmd_s);
+--	process(drc_s)
+--	begin
+--		if rising_edge(drc_s) then
+--			l0_cmd_s <= l0_cmd_sample;
+--		end if;
+--	end process;
 --	L0_CMD_P <= Y_L0_CMD_P;
 --	L0_CMD_N <= Y_L0_CMD_N;
 
 	r3_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => r3_s, I => Y_R3_P, IB => Y_R3_N);
-	r3_obuf : OBUFDS port map (O => R3_P, OB => R3_N, I => r3_s);
+	r3_obuf : OBUFDS port map (O => R3_P, OB => R3_N, I => '0');
 --	R3_P <= Y_R3_P;
 --	R3_N <= Y_R3_N;
 
