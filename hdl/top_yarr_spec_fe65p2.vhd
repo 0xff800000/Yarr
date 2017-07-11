@@ -1440,7 +1440,7 @@ begin
 		C1 => not clk_40,
 		CE => '1',
 		D0 => fe_cmd_o(3),
-		D1 => fe_cmd_o(2),
+		D1 => not fe_cmd_o(2),
 		R  => '0',
 		S  => '0'
 	);

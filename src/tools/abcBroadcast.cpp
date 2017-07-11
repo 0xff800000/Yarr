@@ -7,6 +7,46 @@
 #include <string.h>
 #include <unistd.h>
 
+void sendCommand(TxCore&tx, uint8_t hcc_adr, uint8_t abc_adr, uint8_t reg_adr, uint8_t rwBit,uint32_t data,bool verbose=false){
+        uint32_t header = 0x0;
+        header += (0xbe << 18);
+        header += ((0x1F & hcc_adr) << 13);
+        header += ((0x1F & abc_adr) << 8);
+        header += ((0x7F & reg_adr) << 1);
+        header += ((0x1 & rwBit));
+	
+//	if(verbose)std::cout<<"Sending 0x"<<std::hex<<header<<data<<std::endl;
+	if(verbose)printf("Sending 0x%08x%08x \n",header,data);
+	tx.writeFifo(header);
+	tx.writeFifo(data);
+}
+
+void reset(TxCore&tx){
+	// Reset
+	tx.writeFifo(0xa3);
+	tx.writeFifo(0);
+	tx.writeFifo(0);
+	tx.writeFifo(0xa9);
+	tx.writeFifo(0);
+	tx.writeFifo(0);
+
+	// Write disable
+	sendCommand(tx,0,0x1f,0x00,1,(1<<4),false);
+	tx.writeFifo(0);
+	tx.writeFifo(0);
+
+	// Enable FIFOs
+	uint32_t data = (1<<8)|(1<<12);
+	sendCommand(tx,0,0x1f,0x00,1,(data),false);
+	tx.writeFifo(0);
+	tx.writeFifo(0);
+
+	// Write disable
+	sendCommand(tx,0,0x1f,0x00,1,7,false);
+	tx.writeFifo(0);
+	tx.writeFifo(0);
+}
+
 int main(int argc, char **argv) {
 	int chan = ~0;
 	if (argc == 2)
@@ -15,41 +55,20 @@ int main(int argc, char **argv) {
 	// Init the spec controller
 	SpecController mySpec(0);
 	TxCore myTx(&mySpec);
-	RxCore myRx(&mySpec);
-	
-	// Enable all channels
-	myTx.setCmdEnable(chan);
-	myRx.setRxEnable(chan);
 
-	// Write data to register
-	uint32_t header = 0b1011111000000;
-	uint32_t reg = 0x10;
-	uint32_t abcAddr = 0b11111;
-	uint32_t rwBit = 0;
-	uint32_t data = 0xdeadbeef;
+	// Enable channels
+	myTx.setCmdEnable(chan);
+
+	// Reset
+	reset(myTx);
 	
 	std::cout << "Scanning registers." << std::endl;
 	
-
-	for(int r=0; r<0x7f; r++){
-		uint32_t writeCmd = header;
-		writeCmd = (writeCmd << 5) | abcAddr;
-		writeCmd = (writeCmd << 7) | r;
-		writeCmd = (writeCmd << 1) | rwBit;
-
-		myTx.writeFifo(writeCmd);
-		myTx.writeFifo(0);
-
-		RawData*rx_data = myRx.readData();
-		usleep(100);
-		if(rx_data == NULL){
-			printf("Nothing received from r:%i.\n",r);
-			continue;
+	while(true){
+		for(int r=0; r<0x7f; r++){
+			sendCommand(myTx,0,0x1f,r,0,0);
+			usleep(100);
 		}
-
-		std::cout << " register:" << r << "##" << std::endl;
-		for(int b=0; b<sizeof(rx_data->buf)/sizeof(rx_data->buf[0]); b++)
-			std::cout << b << ":" << std::hex << rx_data->buf[b] << std::dec << std::endl;
 	}
 
 	std::cout << "Done." << std::endl;

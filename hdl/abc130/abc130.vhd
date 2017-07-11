@@ -65,10 +65,10 @@ entity abc is
            DATA_R_P : in  STD_LOGIC;
            DATA_R_N : in  STD_LOGIC;
 			  -- Flow control
-			  XOFFF_L_P : in  STD_LOGIC;
-			  XOFFF_L_N : in  STD_LOGIC;
---			  XOFFF_L_P : out  STD_LOGIC;
---			  XOFFF_L_N : out  STD_LOGIC;
+--			  XOFFF_L_P : in  STD_LOGIC;
+--			  XOFFF_L_N : in  STD_LOGIC;
+			  XOFFF_L_P : out  STD_LOGIC;
+			  XOFFF_L_N : out  STD_LOGIC;
 			  XOFFF_R_P : out  STD_LOGIC;
 			  XOFFF_R_N : out  STD_LOGIC;
 --			  XOFFF_R_P : in  STD_LOGIC;
@@ -92,7 +92,7 @@ architecture Behavioral of abc is
 	
 begin
 	-- No flow control
---	xoff_L_obuf : OBUFDS port map (O => XOFFF_L_P, OB => XOFFF_L_n, I => '0');
+	xoff_L_obuf : OBUFDS port map (O => XOFFF_L_P, OB => XOFFF_L_n, I => '0');
 --	XOFFF_L_P <= '0';
 --	XOFFF_L_n <= '1';
 
@@ -101,7 +101,8 @@ begin
 --	XOFFF_R_n <= '1';
 	
 	-- Set abc address to 0x00
-	addr_o <= (others => '0');
+--	addr_o <= (others => '0');
+	addr_o <= "00001";
 	
 	-- No LVDS terminaison
 	term_o <= '1';
@@ -124,15 +125,15 @@ begin
 --	BCO_P <= Y_BCO_P;
 --	BCO_N <= Y_BCO_N;
 
-	--l0_cmd_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => l0_cmd_sample, I => Y_L0_CMD_P, IB => Y_L0_CMD_N);
-	l0_cmd_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => l0_cmd_s, I => Y_L0_CMD_P, IB => Y_L0_CMD_N);
+	l0_cmd_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => l0_cmd_sample, I => Y_L0_CMD_P, IB => Y_L0_CMD_N);
+	--l0_cmd_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => l0_cmd_s, I => Y_L0_CMD_P, IB => Y_L0_CMD_N);
 	l0_cmd_obuf : OBUFDS port map (O => L0_CMD_P, OB => L0_CMD_N, I => l0_cmd_s);
---	process(drc_s)
---	begin
---		if rising_edge(drc_s) then
---			l0_cmd_s <= l0_cmd_sample;
---		end if;
---	end process;
+	process(drc_s)
+	begin
+		if rising_edge(drc_s) then
+			l0_cmd_s <= l0_cmd_sample;
+		end if;
+	end process;
 --	L0_CMD_P <= Y_L0_CMD_P;
 --	L0_CMD_N <= Y_L0_CMD_N;
 
