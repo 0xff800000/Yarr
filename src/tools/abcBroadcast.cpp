@@ -7,6 +7,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#define nWait (10)
+
 void sendCommand(TxCore&tx, uint8_t hcc_adr, uint8_t abc_adr, uint8_t reg_adr, uint8_t rwBit,uint32_t data,bool verbose=false){
         uint32_t header = 0x0;
         header += (0xbe << 18);
@@ -15,36 +17,40 @@ void sendCommand(TxCore&tx, uint8_t hcc_adr, uint8_t abc_adr, uint8_t reg_adr, u
         header += ((0x7F & reg_adr) << 1);
         header += ((0x1 & rwBit));
 	
-//	if(verbose)std::cout<<"Sending 0x"<<std::hex<<header<<data<<std::endl;
 	if(verbose)printf("Sending 0x%08x%08x \n",header,data);
 	tx.writeFifo(header);
 	tx.writeFifo(data);
 }
 
-void reset(TxCore&tx){
-	// Reset
-	tx.writeFifo(0xa3);
+void init(TxCore&tx){
+	// Resets
+	tx.writeFifo(0xa3); // Sys
 	tx.writeFifo(0);
 	tx.writeFifo(0);
-	tx.writeFifo(0xa9);
+	tx.writeFifo(0xa9); // Soft
+	tx.writeFifo(0);
+	tx.writeFifo(0);
+        tx.writeFifo(0xa5); // BC
 	tx.writeFifo(0);
 	tx.writeFifo(0);
 
-	// Write disable
-	sendCommand(tx,0,0x1f,0x00,1,(1<<4),false);
+	// Init special register
+	sendCommand(tx,0x1f,0x1f,0x00,1,0x0,false);
 	tx.writeFifo(0);
 	tx.writeFifo(0);
 
 	// Enable FIFOs
 	uint32_t data = (1<<8)|(1<<12);
-	sendCommand(tx,0,0x1f,0x00,1,(data),false);
+	sendCommand(tx,0x1f,0x1f,0x20,1,data,false);
 	tx.writeFifo(0);
 	tx.writeFifo(0);
 
-	// Write disable
-	sendCommand(tx,0,0x1f,0x00,1,7,false);
+        // Set max power for DATA and XOFF
+	data = 0x77;
+	sendCommand(tx,0x1f,0x1f,0x21,1,data,false);
 	tx.writeFifo(0);
 	tx.writeFifo(0);
+        
 }
 
 int main(int argc, char **argv) {
@@ -60,14 +66,16 @@ int main(int argc, char **argv) {
 	myTx.setCmdEnable(chan);
 
 	// Reset
-	reset(myTx);
+	init(myTx);
 	
 	std::cout << "Scanning registers." << std::endl;
 	
 	while(true){
 		for(int r=0; r<0x7f; r++){
-			sendCommand(myTx,0,0x1f,r,0,0);
-			usleep(100);
+			sendCommand(myTx,0x1f,0x1f,r,0,0);
+
+                        // Wait
+                        for(int n=0; n<nWait; n++)myTx.writeFifo(0);
 		}
 	}
 

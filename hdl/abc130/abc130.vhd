@@ -65,10 +65,10 @@ entity abc is
            DATA_R_P : in  STD_LOGIC;
            DATA_R_N : in  STD_LOGIC;
 			  -- Flow control
---			  XOFFF_L_P : in  STD_LOGIC;
---			  XOFFF_L_N : in  STD_LOGIC;
-			  XOFFF_L_P : out  STD_LOGIC;
-			  XOFFF_L_N : out  STD_LOGIC;
+			  XOFFF_L_P : in  STD_LOGIC;
+			  XOFFF_L_N : in  STD_LOGIC;
+--			  XOFFF_L_P : out  STD_LOGIC;
+--			  XOFFF_L_N : out  STD_LOGIC;
 			  XOFFF_R_P : out  STD_LOGIC;
 			  XOFFF_R_N : out  STD_LOGIC;
 --			  XOFFF_R_P : in  STD_LOGIC;
@@ -92,7 +92,9 @@ architecture Behavioral of abc is
 	
 begin
 	-- No flow control
-	xoff_L_obuf : OBUFDS port map (O => XOFFF_L_P, OB => XOFFF_L_n, I => '0');
+	xoff_l_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) 
+							port map (O => open, I => XOFFF_L_P, IB => XOFFF_L_N);
+--	xoff_L_obuf : OBUFDS port map (O => XOFFF_L_P, OB => XOFFF_L_n, I => '0');
 --	XOFFF_L_P <= '0';
 --	XOFFF_L_n <= '1';
 
@@ -143,23 +145,23 @@ begin
 --	R3_N <= Y_R3_N;
 
 
-	--RSTB_O <= Y_RSTB_O;
+--	RSTB_O <= not Y_RSTB_O;
 	RSTB_O <= '1';
 	
 	-- Connection from ABC to YARR
-	data_l_s <= '0';
-	data_l_n <= '1';
-	data_l_p <= '0';
+--	data_l_s <= '0';
+--	data_l_n <= '1';
+--	data_l_p <= '0';
 	
 --	data_l_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => data_l_s, I => DATA_L_P, IB => DATA_L_N);
 --	data_l_s <= data_l_p;
---	data_l_obuf : OBUFDS port map (O => Y_DATA_L_P, OB => Y_DATA_L_N, I => data_l_s);
+	data_l_obuf : OBUFDS port map (O => DATA_L_N, OB => DATA_L_P, I => '1');
 --	Y_DATA_L_P <= DATA_L_P;
 --	Y_DATA_L_N <= DATA_L_N;
 
---	data_r_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => data_r_s, I => DATA_R_P, IB => DATA_R_N);
-	data_r_s <= data_r_p;
-	data_r_obuf : OBUFDS port map (O => Y_DATA_R_P, OB => Y_DATA_R_N, I => data_r_s);
+	data_r_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => data_r_s, I => DATA_R_N, IB => DATA_R_P);
+--	data_r_s <= data_r_p;
+	data_r_obuf : OBUFDS port map (O => Y_DATA_R_P, OB => Y_DATA_R_N, I => not data_r_s);
 --	Y_DATA_R_P <= DATA_R_P;
 --	Y_DATA_R_N <= DATA_R_N;
 

@@ -1440,7 +1440,7 @@ begin
 		C1 => not clk_40,
 		CE => '1',
 		D0 => fe_cmd_o(3),
-		D1 => not fe_cmd_o(2),
+		D1 => fe_cmd_o(2),
 		R  => '0',
 		S  => '0'
 	);
@@ -1474,8 +1474,10 @@ begin
 		SRTYPE => "SYNC") -- Specifies "SYNC" or "ASYNC" set/reset
 	port map (
 		Q => clk_80_s, -- 1-bit output data
-		C0 => CLK_80, -- 1-bit clock input
-		C1 => not CLK_80, -- 1-bit clock input
+--		C0 => CLK_80, -- 1-bit clock input
+--		C1 => not CLK_80, -- 1-bit clock input
+		C0 => CLK_160, -- 1-bit clock input
+		C1 => not CLK_160, -- 1-bit clock input
 		CE => '1',  -- 1-bit clock enable input
 		D0 => '1',   -- 1-bit data input (associated with C0)
 		D1 => '0',   -- 1-bit data input (associated with C1)
