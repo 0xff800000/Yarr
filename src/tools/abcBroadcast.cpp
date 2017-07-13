@@ -61,11 +61,17 @@ int main(int argc, char **argv) {
 	// Init the spec controller
 	SpecController mySpec(0);
 	TxCore myTx(&mySpec);
+        TxCore rstTx(&mySpec);
+
+        // Hard reset
+        rstTx.setCmdEnable(1<<4);
+        for(int i=0; i<1000000; i++)rstTx.writeFifo(~0);
+        rstTx.setCmdEnable(0);
 
 	// Enable channels
 	myTx.setCmdEnable(chan);
 
-	// Reset
+	// Soft Reset
 	init(myTx);
 	
 	std::cout << "Scanning registers." << std::endl;

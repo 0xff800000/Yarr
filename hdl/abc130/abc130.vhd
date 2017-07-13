@@ -41,7 +41,8 @@ entity abc is
            Y_L0_CMD_N : in  STD_LOGIC;
            Y_R3_P : in  STD_LOGIC;
            Y_R3_N : in  STD_LOGIC;
-			  Y_RSTB_O : in  STD_LOGIC;
+			  Y_RSTB_P : in  STD_LOGIC;
+			  Y_RSTB_N : in  STD_LOGIC;
 			  -- Data to YARR
 --           Y_DATA_L_P : out  STD_LOGIC;
 --           Y_DATA_L_N : out  STD_LOGIC;
@@ -89,6 +90,7 @@ architecture Behavioral of abc is
 	signal r3_s : std_logic;
 	signal data_l_s : std_logic;
 	signal data_r_s : std_logic;
+	signal rst_s : std_logic;
 	
 begin
 	-- No flow control
@@ -103,8 +105,8 @@ begin
 --	XOFFF_R_n <= '1';
 	
 	-- Set abc address to 0x00
---	addr_o <= (others => '0');
-	addr_o <= "00001";
+	addr_o <= (others => '0');
+--	addr_o <= "00001";
 	
 	-- No LVDS terminaison
 	term_o <= '1';
@@ -145,8 +147,9 @@ begin
 --	R3_N <= Y_R3_N;
 
 
---	RSTB_O <= not Y_RSTB_O;
-	RSTB_O <= '1';
+	rst_buf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => rst_s, I => Y_RSTB_P, IB => Y_RSTB_N);
+	RSTB_O <= rst_s;
+--	RSTB_O <= '1';
 	
 	-- Connection from ABC to YARR
 --	data_l_s <= '0';
@@ -159,7 +162,7 @@ begin
 --	Y_DATA_L_P <= DATA_L_P;
 --	Y_DATA_L_N <= DATA_L_N;
 
-	data_r_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => data_r_s, I => DATA_R_N, IB => DATA_R_P);
+	data_r_ibuf : IBUFDS generic map(DIFF_TERM => true, IBUF_LOW_PWR => FALSE) port map (O => data_r_s, I => DATA_R_N, IB => DATA_R_P);
 --	data_r_s <= data_r_p;
 	data_r_obuf : OBUFDS port map (O => Y_DATA_R_P, OB => Y_DATA_R_N, I => not data_r_s);
 --	Y_DATA_R_P <= DATA_R_P;

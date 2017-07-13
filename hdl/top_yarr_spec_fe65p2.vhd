@@ -16,7 +16,7 @@ use UNISIM.vcomponents.all;
 
 entity yarr is
   generic (
-	  g_TX_CHANNELS : integer := 4;
+	  g_TX_CHANNELS : integer := 5;
 	  g_RX_CHANNELS : integer := 16
 	  );
   port
@@ -130,6 +130,8 @@ entity yarr is
 		  L0_CMD_P : out std_logic;
 		  R3_N : out std_logic;
 		  R3_P : out std_logic;
+		  RST_ABC_P : out std_logic;
+		  RST_ABC_N : out std_logic;
 		  DATA_L_N : in std_logic;
 		  DATA_L_P : in std_logic;
 		  DATA_R_N : in std_logic;
@@ -1429,6 +1431,7 @@ begin
       I => ddr_clk_buf);
 
 	-- ABC
+	rst_buf : OBUFDS port map (O => RST_ABC_N, OB => RST_ABC_P, I => not fe_cmd_o(4));
 	-- Map the data input
 	--data_l_buf : IBUFDS generic map(DIFF_TERM => TRUE, IBUF_LOW_PWR => FALSE) port map (O => fe_data_i(1), I => DATA_L_P, IB => DATA_L_N);
 	--data_r_buf : IBUFDS generic map(DIFF_TERM => TRUE, IBUF_LOW_PWR => FALSE) port map (O => fe_data_i(2), I => DATA_R_P, IB => DATA_R_N);
@@ -1474,10 +1477,10 @@ begin
 		SRTYPE => "SYNC") -- Specifies "SYNC" or "ASYNC" set/reset
 	port map (
 		Q => clk_80_s, -- 1-bit output data
---		C0 => CLK_80, -- 1-bit clock input
---		C1 => not CLK_80, -- 1-bit clock input
-		C0 => CLK_160, -- 1-bit clock input
-		C1 => not CLK_160, -- 1-bit clock input
+		C0 => CLK_80, -- 1-bit clock input
+		C1 => not CLK_80, -- 1-bit clock input
+--		C0 => CLK_160, -- 1-bit clock input
+--		C1 => not CLK_160, -- 1-bit clock input
 		CE => '1',  -- 1-bit clock enable input
 		D0 => '1',   -- 1-bit data input (associated with C0)
 		D1 => '0',   -- 1-bit data input (associated with C1)
