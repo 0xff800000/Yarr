@@ -79,7 +79,8 @@ entity abc is
            ADDR_O : out  STD_LOGIC_VECTOR(4 DOWNTO 0);
 			  REG_EN_D_O : out  STD_LOGIC;
 			  REG_EN_A_O : out  STD_LOGIC;
-           SHUNT_CTL_O : out  STD_LOGIC);
+           SHUNT_CTL_O : out  STD_LOGIC;
+			  ABCUP_O : out  STD_LOGIC);
 end abc;
 
 architecture Behavioral of abc is
@@ -117,6 +118,8 @@ begin
 	-- Enable voltage regulators
 	REG_EN_D_O <= '0';
 	REG_EN_A_O <= '0';
+	
+	ABCUP_O <= '0';
 
 	-- Connection from YARR to ABC
 	drc_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => drc_s, I => Y_DRC_P, IB => Y_DRC_N);
