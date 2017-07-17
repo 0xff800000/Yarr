@@ -59,10 +59,10 @@ entity abc is
            R3_N : out  STD_LOGIC;
 			  RSTB_O : out  STD_LOGIC;
 			  -- Data from ABC
---           DATA_L_P : in  STD_LOGIC;
---           DATA_L_N : in  STD_LOGIC;
-           DATA_L_P : out  STD_LOGIC;
-           DATA_L_N : out  STD_LOGIC;
+           DATA_L_P : in  STD_LOGIC;
+           DATA_L_N : in  STD_LOGIC;
+--           DATA_L_P : out  STD_LOGIC;
+--           DATA_L_N : out  STD_LOGIC;
            DATA_R_P : in  STD_LOGIC;
            DATA_R_N : in  STD_LOGIC;
 			  -- Flow control
@@ -95,19 +95,19 @@ architecture Behavioral of abc is
 	
 begin
 	-- No flow control
-	xoff_l_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) 
-							port map (O => open, I => XOFFF_L_P, IB => XOFFF_L_N);
+--	xoff_l_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) 
+--							port map (O => open, I => XOFFF_L_P, IB => XOFFF_L_N);
 --	xoff_L_obuf : OBUFDS port map (O => XOFFF_L_P, OB => XOFFF_L_n, I => '0');
---	XOFFF_L_P <= '0';
---	XOFFF_L_n <= '1';
+--	XOFFF_L_P <= '1';
+--	XOFFF_L_n <= '0';
 
-	xoff_R_obuf : OBUFDS port map (O => XOFFF_R_P, OB => XOFFF_R_n, I => '0');
---	XOFFF_R_P <= '0';
---	XOFFF_R_n <= '1';
+--	xoff_R_obuf : OBUFDS port map (O => XOFFF_R_P, OB => XOFFF_R_n, I => '0');
+	XOFFF_R_P <= '0';
+	XOFFF_R_n <= '1';
 	
 	-- Set abc address to 0x00
-	addr_o <= (others => '0');
---	addr_o <= "00001";
+--	addr_o <= (others => '0');
+	addr_o <= "00001";
 	
 	-- No LVDS terminaison
 	term_o <= '1';
@@ -161,13 +161,14 @@ begin
 	
 --	data_l_ibuf : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => data_l_s, I => DATA_L_P, IB => DATA_L_N);
 --	data_l_s <= data_l_p;
-	data_l_obuf : OBUFDS port map (O => DATA_L_N, OB => DATA_L_P, I => '1');
+--	data_l_obuf : OBUFDS port map (O => DATA_L_N, OB => DATA_L_P, I => '1');
 --	Y_DATA_L_P <= DATA_L_P;
 --	Y_DATA_L_N <= DATA_L_N;
 
-	data_r_ibuf : IBUFDS generic map(DIFF_TERM => true, IBUF_LOW_PWR => FALSE) port map (O => data_r_s, I => DATA_R_N, IB => DATA_R_P);
+--	data_r_ibuf : IBUFDS generic map(DIFF_TERM => true, IBUF_LOW_PWR => FALSE) port map (O => data_r_s, I => DATA_R_N, IB => DATA_R_P);
 --	data_r_s <= data_r_p;
-	data_r_obuf : OBUFDS port map (O => Y_DATA_R_P, OB => Y_DATA_R_N, I => not data_r_s);
+--	data_r_obuf : OBUFDS port map (O => Y_DATA_R_P, OB => Y_DATA_R_N, I => not data_r_s);
+	data_r_obuf : OBUFDS port map (O => Y_DATA_R_P, OB => Y_DATA_R_N, I => '0');
 --	Y_DATA_R_P <= DATA_R_P;
 --	Y_DATA_R_N <= DATA_R_N;
 
