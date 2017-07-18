@@ -102,8 +102,8 @@ begin
 --	XOFFF_L_n <= '0';
 
 --	xoff_R_obuf : OBUFDS port map (O => XOFFF_R_P, OB => XOFFF_R_n, I => '0');
-	XOFFF_R_P <= '1';
-	XOFFF_R_n <= '0';
+	XOFFF_R_P <= '0';
+	XOFFF_R_n <= '1';
 	
 	-- Set abc address to 0x00
 --	addr_o <= (others => '0');
@@ -165,10 +165,10 @@ begin
 --	Y_DATA_L_P <= DATA_L_P;
 --	Y_DATA_L_N <= DATA_L_N;
 
---	data_r_ibuf : IBUFDS generic map(DIFF_TERM => true, IBUF_LOW_PWR => FALSE) port map (O => data_r_s, I => DATA_R_N, IB => DATA_R_P);
+	data_r_ibuf : IBUFDS generic map(DIFF_TERM => true, IBUF_LOW_PWR => FALSE) port map (O => data_r_s, I => DATA_R_N, IB => DATA_R_P);
 --	data_r_s <= data_r_p;
---	data_r_obuf : OBUFDS port map (O => Y_DATA_R_P, OB => Y_DATA_R_N, I => not data_r_s);
-	data_r_obuf : OBUFDS port map (O => Y_DATA_R_P, OB => Y_DATA_R_N, I => '0');
+	data_r_obuf : OBUFDS port map (O => Y_DATA_R_P, OB => Y_DATA_R_N, I => data_r_s);
+--	data_r_obuf : OBUFDS port map (O => Y_DATA_R_P, OB => Y_DATA_R_N, I => '0');
 --	Y_DATA_R_P <= DATA_R_P;
 --	Y_DATA_R_N <= DATA_R_N;
 

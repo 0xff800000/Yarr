@@ -1434,7 +1434,7 @@ begin
 	rst_buf : OBUFDS port map (O => RST_ABC_N, OB => RST_ABC_P, I => not fe_cmd_o(4));
 	-- Map the data input
 	--data_l_buf : IBUFDS generic map(DIFF_TERM => TRUE, IBUF_LOW_PWR => FALSE) port map (O => fe_data_i(1), I => DATA_L_P, IB => DATA_L_N);
-	--data_r_buf : IBUFDS generic map(DIFF_TERM => TRUE, IBUF_LOW_PWR => FALSE) port map (O => fe_data_i(2), I => DATA_R_P, IB => DATA_R_N);
+--	data_r_buf : IBUFDS generic map(DIFF_TERM => TRUE, IBUF_LOW_PWR => FALSE) port map (O => fe_data_i(3), I => DATA_R_P, IB => DATA_R_N);
 	-- Config DDR buffer
 	abc_ddr_buffer : ODDR2
 	port map (

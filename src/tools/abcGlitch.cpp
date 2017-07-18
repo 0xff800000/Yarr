@@ -127,7 +127,6 @@ int main(int argc, char **argv) {
 	// Init the spec controller
 	SpecController mySpec(0);
 	TxCore myTx(&mySpec);
-        RxCore myRx(&mySpec);
 
         // Hard reset
         myTx.setCmdEnable(1<<4);
@@ -138,7 +137,6 @@ int main(int argc, char **argv) {
 
 	// Enable channels
 	myTx.setCmdEnable(1<<3);
-        myRx.setRxEnable(1<<1);
 
 	// Soft Reset
 	init(myTx);
@@ -167,21 +165,50 @@ int main(int argc, char **argv) {
 
 
 	while(true){
+		//for(int r=INPUT_adr_start; r<INPUT_adr_stop+1; r++){
 		
 		sendCommand2(myTx,HCC_adr,ABC_adr,0x20,1,0x00001f11, false);
 		//sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x11,false);
 		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x55,false);
-
-                // Read data
 		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x00, false);
-        	usleep(30);
-                RawData* data = myRx.readData();
-                if(data == 0)continue;
-                if(data->buf != 0){
-                    std::cout << data->buf[0] << std::endl;
-                }
-
-        	usleep(100);	
+	usleep(30);	
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x00, false);
+	usleep(30);	
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x00, false);
+	usleep(100);	
+		//sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x77,false);		
+		/*sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x11,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x11,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x22,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x22,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x33,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x33,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x44,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x44,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x55,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x55,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x66,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x66,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x77,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x77,false);
+	        */	
+        //sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x77,false);
+usleep(30);
+		/*
+		for(int r=0x0; r<0x7f; r++){
+//			std::cout <<std::hex<< r << std::endl;
+			init(myTx);
+			
+			sendCommand2(myTx,HCC_adr,ABC_adr,r,0,0x77);
+			while(!myTx.isCmdEmpty())std::cout<<"FlushFifo";
+			int a;
+//			std::cin >> a;
+			
+                        usleep(1000);
+                        // Wait
+//			for(int n=0; n<nWait; n++)myTx.writeFifo(0);
+		}
+		*/
 	}
 
 	std::cout << "Done." << std::endl;

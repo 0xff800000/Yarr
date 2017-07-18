@@ -81,18 +81,15 @@ void init(TxCore&tx){
 
 
 	// Enable FIFOs
-	uint32_t data = 0x00001f02;
+	uint32_t data = 0x00011f11;
 	sendCommand2(tx,HCC_adr,ABC_adr,0x20,1,data,false);
 
 
 	
-        // Set min power for DATA and XOFF
-	data = 0x00000000;
-	sendCommand2(tx,HCC_adr,ABC_adr,0x21,1,data,false);
 
 
         // Set max power for DATA and XOFF
-	data = 0x00000077;
+	data = 0x00000055;
 	sendCommand2(tx,HCC_adr,ABC_adr,0x21,1,data,false);
 
 	
@@ -143,32 +140,31 @@ int main(int argc, char **argv) {
 	init(myTx);
 
 	// Initialise input registers
-/*	for(int r=0x10; r<0x18; r++){
-		uint32_t d = 0xdeadc0de;
+	for(int r=0x10; r<0x11; r++){
+		uint32_t d = 0x11111111;
 		sendCommand(myTx,HCC_adr,ABC_adr,r,1,d);
 		myTx.writeFifo(0);
 		myTx.writeFifo(0);
 		myTx.writeFifo(0);
 	}
-	
-	// Send L0 readout
-	myTx.setCmdEnable(0);
-	myTx.setCmdEnable(1<<2);
-	myTx.writeFifo(1);
-	myTx.writeFifo(0);
-	myTx.writeFifo(0);
-	myTx.setCmdEnable(1<<3);
-*/	
-	
-	std::cout << "Scanning inputs" << std::endl;
-	
-	init(myTx);
 
+
+        usleep(1000);
 
 	while(true){
-		//for(int r=INPUT_adr_start; r<INPUT_adr_stop+1; r++){
+            // Send L0 readout
+            myTx.setCmdEnable(0);
+            myTx.setCmdEnable(1<<2);
+            myTx.writeFifo(1);
+            myTx.writeFifo(0);
+            myTx.writeFifo(0);
+            myTx.setCmdEnable(1<<3);
+
+            usleep(100);
+
+/*		//for(int r=INPUT_adr_start; r<INPUT_adr_stop+1; r++){
 		
-		sendCommand2(myTx,HCC_adr,ABC_adr,0x20,1,0x00001001, false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x20,1,0x00001101, false);
 		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x55,false);
 		sendCommand2(myTx,HCC_adr,ABC_adr,0x23,0,0x00, false);
 	usleep(30);	
@@ -188,7 +184,7 @@ int main(int argc, char **argv) {
 		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x77,false);
 		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x77,false);
 		//sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x77,false);
-usleep(30);
+usleep(30);*/
 		/*
 		for(int r=0x0; r<0x7f; r++){
 //			std::cout <<std::hex<< r << std::endl;
