@@ -102,8 +102,8 @@ begin
 --	XOFFF_L_n <= '0';
 
 --	xoff_R_obuf : OBUFDS port map (O => XOFFF_R_P, OB => XOFFF_R_n, I => '0');
-	XOFFF_R_P <= '0';
-	XOFFF_R_n <= '1';
+	XOFFF_R_P <= '1';
+	XOFFF_R_n <= '0';
 	
 	-- Set abc address to 0x00
 --	addr_o <= (others => '0');

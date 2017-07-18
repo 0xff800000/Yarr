@@ -10,12 +10,12 @@
 #define nWait (10)
 
 #define HCC_adr (0x1f)
-#define ABC_adr (0xff)
+#define ABC_adr (0x1)
 
 #define INPUT_adr_start (0x18)
 #define INPUT_adr_stop (0x1f)
 
-void sendCommand(TxCore&tx, uint8_t hcc_adr, uint8_t abc_adr, uint8_t reg_adr, uint8_t rwBit,uint32_t data,bool verbose=false){
+void sendCommand2(TxCore&tx, uint8_t hcc_adr, uint8_t abc_adr, uint8_t reg_adr, uint8_t rwBit,uint32_t data,bool verbose=false){
         uint32_t header = 0x0;
         header += (0xbe << 18);
         header += ((0x1F & hcc_adr) << 13);
@@ -26,9 +26,13 @@ void sendCommand(TxCore&tx, uint8_t hcc_adr, uint8_t abc_adr, uint8_t reg_adr, u
 	if(verbose)printf("Sending 0x%08x%08x \n",header,data);
 	tx.writeFifo(header);
 	tx.writeFifo(data);
+
+	tx.writeFifo(0);
+	tx.writeFifo(0);
+	while(!tx.isCmdEmpty());
 }
 
-void sendCommand2(TxCore&tx, uint8_t hcc_adr, uint8_t abc_adr, uint8_t reg_adr, uint8_t rwBit,uint32_t data,bool verbose=false){
+void sendCommand(TxCore&tx, uint8_t hcc_adr, uint8_t abc_adr, uint8_t reg_adr, uint8_t rwBit,uint32_t data,bool verbose=false){
 	uint8_t hccAddr, abcAddr, writeNotRead, addr;
 	hccAddr = hcc_adr;
 	abcAddr = abc_adr;
@@ -48,6 +52,10 @@ void sendCommand2(TxCore&tx, uint8_t hcc_adr, uint8_t abc_adr, uint8_t reg_adr, 
 	if(verbose)printf("Sending 0x%08x%08x \n",header,data);
 	tx.writeFifo(header);
 	tx.writeFifo(data);
+
+	tx.writeFifo(0);
+	tx.writeFifo(0);
+	while(!tx.isCmdEmpty());
 }
 
 void init(TxCore&tx){
@@ -70,44 +78,46 @@ void init(TxCore&tx){
 
 	// Init special register
 	sendCommand2(tx,HCC_adr,ABC_adr,0x00,1,0x0,false);
-	tx.writeFifo(0);
-	tx.writeFifo(0);
+
 
 	// Enable FIFOs
 	uint32_t data = 0x00001f02;
 	sendCommand2(tx,HCC_adr,ABC_adr,0x20,1,data,false);
-	tx.writeFifo(0);
-	tx.writeFifo(0);
 
+
+	
         // Set min power for DATA and XOFF
 	data = 0x00000000;
 	sendCommand2(tx,HCC_adr,ABC_adr,0x21,1,data,false);
-	tx.writeFifo(0);
-	tx.writeFifo(0);
+
 
         // Set max power for DATA and XOFF
 	data = 0x00000077;
 	sendCommand2(tx,HCC_adr,ABC_adr,0x21,1,data,false);
-	tx.writeFifo(0);
-	tx.writeFifo(0);
 
+	
+/*
 	// Set latency
 	data = 0x00000001;
 	sendCommand2(tx,HCC_adr,ABC_adr,0x22,1,data,false);
 	tx.writeFifo(0);
 	tx.writeFifo(0);
+	while(!tx.isCmdEmpty());
 
 	// Disable packet limit
 	data = 0x00000000;
 	sendCommand2(tx,HCC_adr,ABC_adr,0x23,1,data,false);
 	tx.writeFifo(0);
 	tx.writeFifo(0);
-
+	while(!tx.isCmdEmpty());
+	
 	// Disable write
 //	sendCommand2(tx,HCC_adr,ABC_adr,0x00,1,(1<<4),false);
 	tx.writeFifo(0);
 	tx.writeFifo(0);
+	while(!tx.isCmdEmpty());
 	usleep(1);
+*/
 }
 
 int main(int argc, char **argv) {
@@ -151,23 +161,52 @@ int main(int argc, char **argv) {
 */	
 	
 	std::cout << "Scanning inputs" << std::endl;
+	
+	init(myTx);
+
+
 	while(true){
 		//for(int r=INPUT_adr_start; r<INPUT_adr_stop+1; r++){
+		
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x20,1,0x00001001, false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x55,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x23,0,0x00, false);
+	usleep(30);	
+		//sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x77,false);		
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x11,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x11,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x22,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x22,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x33,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x33,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x44,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x44,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x55,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x55,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x66,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x66,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,1,0x77,false);
+		sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x77,false);
+		//sendCommand2(myTx,HCC_adr,ABC_adr,0x21,0,0x77,false);
+usleep(30);
+		/*
 		for(int r=0x0; r<0x7f; r++){
 //			std::cout <<std::hex<< r << std::endl;
 
 			init(myTx);
+			
 			sendCommand2(myTx,HCC_adr,ABC_adr,r,0,0x77);
 			while(!myTx.isCmdEmpty())std::cout<<"FlushFifo";
 			int a;
 //			std::cin >> a;
-
+			
                         usleep(1000);
 
                         // Wait
 //			for(int n=0; n<nWait; n++)myTx.writeFifo(0);
 
 		}
+		*/
 	}
 
 	std::cout << "Done." << std::endl;
