@@ -18,7 +18,7 @@ architecture Behavioral of ser_in_par_out is
 	constant NB_BITS : integer := 8;
 	constant N_CYCL : integer := 2;
 
-	signal bit_counter : integer range 0 to 7 := 0;
+	signal edge_count : integer range 0 to 7 := 0;
 	signal q_word_counter : integer range 0 to 63 := 0;
 	signal in_reg : std_logic_vector(63 downto 0);
 	signal back : std_logic_vector(63 downto 0);
@@ -32,8 +32,9 @@ begin
 			in_reg <= (others => '0');
 			valid_o <= '0';
 			po_o <= (others => '0');
+			edge_count <= 0;
 		elsif rising_edge(clk_i) then
-			valid_o <= '0';
+--			valid_o <= '0';
 
 			-- Sample input
 			in_reg <= std_logic_vector(unsigned(in_reg) sll 1);
@@ -43,10 +44,10 @@ begin
 			if in_reg(63) = '1' then
 				back <= in_reg;
 				in_reg <= (others => '0');
-				bytes <= 8; --
+				bytes <= 8; -- Send 8 bytes
 			end if;
 
-			-- Shift out input
+			-- Latch the output during N_CYCL + 1
 			clock_div <= clock_div + 1;
 			if clock_div = N_CYCL then
 				clock_div <= 0;
@@ -56,10 +57,17 @@ begin
 					bytes <= bytes - 1;
 				end if;
 			end if;
+
+		end if;
+		
+		-- Valid output (ugly code)
+		if falling_edge(clk_i) and clock_div = 1 and bytes = 7 then
+			valid_o <= '1';
+		elsif falling_edge(clk_i) then
+			valid_o <= '0';
 		end if;
 
-
-
 	end process;
+	
 
 end Behavioral;

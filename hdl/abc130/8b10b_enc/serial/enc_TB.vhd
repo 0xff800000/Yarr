@@ -28,16 +28,43 @@ architecture Behavioral of enc_tb is
 		valid_o : out std_logic
 		);
 	end component;
-
+	
+	component mux_8b10b
+	port(
+		rst_i : in std_logic;
+		clk_i : in std_logic;
+		sample_i : in std_logic;
+		write_o : out std_logic;
+		data_i : in std_logic_vector(9 downto 0);
+		data_o : out std_logic_vector(79 downto 0)
+		);
+	end component;
+	
+	component par_in_ser_out
+	port(
+		rst_i : in std_logic;
+		clk_i : in std_logic;
+		start_i : in std_logic;
+		we_i : in std_logic;
+		data_i : in std_logic_vector(79 downto 0);
+		data_o : out std_logic;
+		done_o : out std_logic
+	);
+	end component;
+	
 	signal clk_s : std_logic;
 	signal rst_s : std_logic;
 	signal di_s : std_logic;
 	signal valid_s : std_logic;
+	signal so_s : std_logic;
+	signal wo_s : std_logic;
 	signal par_out : std_logic_vector(7 downto 0);
 	signal enc_out : std_logic_vector(9 downto 0);
+	signal par_in : std_logic_vector(79 downto 0);
 
 	signal in_reg  : std_logic_vector(63 downto 0);
 	signal bit_cnt : integer := 64;
+	signal pause : integer := 0;
 
 begin
 	-- Generate clock
@@ -56,11 +83,16 @@ begin
 			di_s <= '0';
 			in_reg <= x"fedcba9876543210";
 		elsif rising_edge(clk_s) then
-			di_s <= in_reg(bit_cnt-1);
-			if bit_cnt = 1 then
-				bit_cnt <= 64;
+			if pause > 0 then
+				pause <= pause - 1;
 			else
-				bit_cnt <= bit_cnt - 1;
+				di_s <= in_reg(bit_cnt-1);
+				if bit_cnt = 1 then
+					bit_cnt <= 64;
+					pause <= 100;
+				else
+					bit_cnt <= bit_cnt - 1;
+				end if;
 			end if;
 		end if;
 	end process;
@@ -106,6 +138,25 @@ begin
 		io => enc_out(5),
 		jo => enc_out(9)
 		);
-
+		
+	mux : mux_8b10b port map(
+		rst_i => rst_s,
+		clk_i => clk_s,
+		sample_i => valid_s,
+		write_o => wo_s,
+		data_i => enc_out,
+		data_o => par_in
+		);
+	
+	piso : par_in_ser_out port map(
+		rst_i => rst_s,
+		clk_i => clk_s,
+		start_i => wo_s,
+		we_i => wo_s,
+		data_i => par_in,
+		data_o => so_s,
+		done_o => open
+	);
+	
 
 end Behavioral;

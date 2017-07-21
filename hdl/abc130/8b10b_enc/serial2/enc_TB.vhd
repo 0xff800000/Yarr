@@ -31,7 +31,7 @@ architecture Behavioral of enc_tb is
 	component STD_FIFO
 		Generic (
 			constant DATA_WIDTH  : positive := 10;
-			constant FIFO_DEPTH	: positive := 16
+			constant FIFO_DEPTH	: positive := 160
 		);
 		port (
 			CLK		: in std_logic;
@@ -50,7 +50,8 @@ architecture Behavioral of enc_tb is
 		rst_i : in std_logic;
 		clk_i : in std_logic;
 		data_i : in std_logic_vector(9 downto 0);
-		data_o : out std_logic
+		data_o : out std_logic;
+		read_o : out std_logic
 	);
 	end component;
 	
@@ -63,6 +64,7 @@ architecture Behavioral of enc_tb is
 	signal di_s : std_logic;
 	signal so_s : std_logic;
 	signal k_s : std_logic;
+	signal read_s : std_logic;
 	signal enc_in : std_logic_vector(7 downto 0);
 	signal enc_out : std_logic_vector(9 downto 0);
 	signal par_in : std_logic_vector(9 downto 0);
@@ -84,9 +86,9 @@ begin
 	process
 	begin
 		clk160_s <= '0';
-		wait for Tclk/9;
+		wait for Tclk/2;
 		clk160_s <= '1';
-		wait for Tclk/9;
+		wait for Tclk/2;
 	end process;
 
 	-- Input bitstream
@@ -159,7 +161,7 @@ begin
 			RST		=> rst_s,
 			DataIn	=> enc_out,
 			WriteEn	=> clk_s,
-			ReadEn	=> clk_s,
+			ReadEn	=> read_s,
 			DataOut	=> par_in,
 			Full	=> open,
 			Empty	=> open
@@ -169,7 +171,8 @@ begin
 		rst_i => rst_s,
 		clk_i => clk160_s,
 		data_i => par_in,
-		data_o => so_s
+		data_o => so_s,
+		read_o => read_s
 	);
 	
 
