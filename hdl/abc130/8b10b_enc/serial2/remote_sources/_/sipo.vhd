@@ -30,6 +30,8 @@ begin
 			-- Sample input
 			in_reg <= std_logic_vector(unsigned(in_reg) sll 1);
 			in_reg(0) <= si_i;
+			
+			fifo <= std_logic_vector(unsigned(fifo) sll 9);
 
 			-- Shift out the register
 			if in_reg(63) = '1' then
@@ -49,19 +51,24 @@ begin
 				fifo(7 downto 0) <= IDLE;
 				fifo(8) <= '1';	-- K special
 			end if;
-
-		end if;
-		
-		if falling_edge(clk_i) then
+			
 			if unsigned(fifo) > 0 then
-				-- Shift the register << 8
-				--fifo <= std_logic_vector(unsigned(fifo) sll 8);
-				fifo <= std_logic_vector(unsigned(fifo) sll 9);
-				--po_o <= fifo(63 downto 56);
 				po_o <= fifo(70 downto 63);
 				k_o <= fifo(71);
 			end if;
+
 		end if;
+		
+--		if falling_edge(clk_i) then
+--			if unsigned(fifo) > 0 then
+--				-- Shift the register << 8
+--				--fifo <= std_logic_vector(unsigned(fifo) sll 8);
+--				fifo <= std_logic_vector(unsigned(fifo) sll 9);
+--				--po_o <= fifo(63 downto 56);
+--				po_o <= fifo(70 downto 63);
+--				k_o <= fifo(71);
+--			end if;
+--		end if;
 	end process;
 	
 	

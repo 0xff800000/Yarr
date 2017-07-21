@@ -135,7 +135,9 @@ entity yarr is
 		  DATA_L_N : in std_logic;
 		  DATA_L_P : in std_logic;
 		  DATA_R_N : in std_logic;
-		  DATA_R_P : in std_logic
+		  DATA_R_P : in std_logic;
+		  CLK_160_N : out std_logic;
+		  CLK_160_P : out std_logic
       );
 end yarr;
 
@@ -699,6 +701,7 @@ architecture rtl of yarr is
 	signal l0_cmd_s : std_logic;
 	signal clk_40_s : std_logic;
 	signal clk_80_s : std_logic;
+	signal clk_160_s : std_logic;
   
   -- DDR3 clock
   signal ddr_clk     : std_logic;
@@ -1481,6 +1484,24 @@ begin
 		C1 => not CLK_80, -- 1-bit clock input
 --		C0 => CLK_160, -- 1-bit clock input
 --		C1 => not CLK_160, -- 1-bit clock input
+		CE => '1',  -- 1-bit clock enable input
+		D0 => '1',   -- 1-bit data input (associated with C0)
+		D1 => '0',   -- 1-bit data input (associated with C1)
+		R => '0',    -- 1-bit reset input
+		S => '0'     -- 1-bit set input
+	);
+	
+	clk_160_abc : OBUFDS port map (O => CLK_160_P, OB => CLK_160_N, I => clk_160_s);
+	
+	CLK_160_buf_abc : ODDR2
+	generic map(
+		DDR_ALIGNMENT => "NONE", -- Sets output alignment to "NONE", "C0", "C1" 
+		INIT => '0', -- Sets initial state of the Q output to '0' or '1'
+		SRTYPE => "SYNC") -- Specifies "SYNC" or "ASYNC" set/reset
+	port map (
+		Q => clk_160_s, -- 1-bit output data
+		C0 => CLK_160, -- 1-bit clock input
+		C1 => not CLK_160, -- 1-bit clock input
 		CE => '1',  -- 1-bit clock enable input
 		D0 => '1',   -- 1-bit data input (associated with C0)
 		D1 => '0',   -- 1-bit data input (associated with C1)

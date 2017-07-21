@@ -629,6 +629,8 @@ NET "DATA_L_N" LOC = W13;# | IOSTANDARD = "LVDS_25"; # LA21_N
 NET "DATA_L_P" LOC = V13;# | IOSTANDARD = "LVDS_25"; # LA21_P
 #NET "DATA_R_P" LOC = Y15;# | IOSTANDARD = "LVDS_25"; # LA19_P
 #NET "DATA_R_N" LOC = AB15;# | IOSTANDARD = "LVDS_25"; # LA19_N
+NET "CLK_160_P" LOC = R11; # LA20_P
+NET "CLK_160_N" LOC = T11; # LA20_N
 
 #===============================================================================
 # False Path
