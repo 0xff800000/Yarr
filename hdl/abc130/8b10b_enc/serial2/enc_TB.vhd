@@ -24,6 +24,7 @@ architecture Behavioral of enc_tb is
 		rst_i : in std_logic;
 		clk_i : in std_logic;
 		si_i : in std_logic;
+		k_o : out std_logic;
 		po_o : out std_logic_vector(7 downto 0)
 		);
 	end component;
@@ -125,10 +126,11 @@ begin
 		rst_i => rst_s,
 		clk_i => clk_s,
 		si_i => di_s,
+		k_o  => k_s,
 		po_o => enc_in
 		);
 
-	k_s <= '1' when enc_in = IDLE else '0';
+	--k_s <= '1' when enc_in = IDLE else '0';
 
 	encoder : enc_8b10b port map(
 		reset => rst_s,
