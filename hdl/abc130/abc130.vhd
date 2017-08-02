@@ -118,7 +118,7 @@ architecture Behavioral of abc is
 	component STD_FIFO
 		Generic (
 			constant DATA_WIDTH  : positive := 10;
-			constant FIFO_DEPTH	: positive := 160
+			constant FIFO_DEPTH	: positive := 33
 		);
 		port (
 			CLK		: in std_logic;
@@ -233,25 +233,23 @@ begin
 	data_r_ibuf : IBUFDS generic map(DIFF_TERM => true, IBUF_LOW_PWR => FALSE) port map (O => data_r_s, I => DATA_R_N, IB => DATA_R_P);
 --	data_r_s <= data_r_p;
 	data_r_obuf : OBUFDS port map (O => Y_DATA_R_P, OB => Y_DATA_R_N, I => so_s);
---	data_r_obuf : OBUFDS port map (O => Y_DATA_R_P, OB => Y_DATA_R_N, I => '0');
+--	data_r_obuf : OBUFDS port map (O => Y_DATA_R_P, OB => Y_DATA_R_N, I => data_r_s);
 --	Y_DATA_R_P <= DATA_R_P;
 --	Y_DATA_R_N <= DATA_R_N;
 
-	clk_160 : IBUFDS generic map(DIFF_TERM => true, IBUF_LOW_PWR => FALSE) port map (O => y_clk_160_s, I => Y_CLK_160_N, IB => Y_CLK_160_P);
+	clk_160 : IBUFDS generic map(DIFF_TERM => false, IBUF_LOW_PWR => FALSE) port map (O => y_clk_160_s, I => Y_CLK_160_P, IB => Y_CLK_160_N);
 
 	sipo : ser_in_par_out port map(
-		rst_i => rst_s,
-		clk_i => bco_s,
+		rst_i => not rst_s,
+		clk_i => drc_s,
 		si_i => data_r_s,
 		k_o  => k_s,
 		po_o => enc_in
 		);
 
-	--k_s <= '1' when enc_in = IDLE else '0';
-
 	encoder : enc_8b10b port map(
-		reset => rst_s,
-		sbyteclk => bco_s,
+		reset => not rst_s,
+		sbyteclk => drc_s,
 		ki => k_s,
 		ai => enc_in(0),
 		bi => enc_in(1),
@@ -277,9 +275,9 @@ begin
 	fifo : STD_FIFO
 		PORT MAP (
 			CLK		=> y_clk_160_s,
-			RST		=> rst_s,
+			RST		=> not rst_s,
 			DataIn	=> enc_out,
-			WriteEn	=> clk_s,
+			WriteEn	=> drc_s,
 			ReadEn	=> read_s,
 			DataOut	=> par_in,
 			Full	=> open,
@@ -287,7 +285,7 @@ begin
 		);
 
 	piso : par_in_ser_out port map(
-		rst_i => rst_s,
+		rst_i => not rst_s,
 		clk_i => y_clk_160_s,
 		data_i => par_in,
 		data_o => so_s,

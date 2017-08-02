@@ -181,7 +181,7 @@ int main(int argc, char **argv) {
                     std::cout << data->buf[0] << std::endl;
                 }
 
-        	usleep(100);	
+        	usleep(1000);	
 	}
 
 	std::cout << "Done." << std::endl;

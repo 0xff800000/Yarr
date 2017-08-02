@@ -32,7 +32,7 @@ architecture Behavioral of enc_tb is
 	component STD_FIFO
 		Generic (
 			constant DATA_WIDTH  : positive := 10;
-			constant FIFO_DEPTH	: positive := 160
+			constant FIFO_DEPTH	: positive := 66
 		);
 		port (
 			CLK		: in std_logic;
